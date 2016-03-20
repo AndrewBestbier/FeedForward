@@ -1,110 +1,118 @@
 import * as _ from 'underscore';
 
-// This is the Dataset in our blog
+/* In Memory Data imports */
+import RoomsList from './data/rooms';
 import PostsList from './data/posts';
-import AuthorsList from './data/authors';
-import {CommentList, ReplyList} from './data/comments';
+import CommentsList from './data/comments';
 
+/* GraphQL standard Imports */
 import {
-  // These are the basic GraphQL types
   GraphQLInt,
   GraphQLFloat,
   GraphQLString,
   GraphQLList,
   GraphQLObjectType,
   GraphQLEnumType,
-
-  // This is used to create required fileds and arguments
   GraphQLNonNull,
-
-  // This is the class we need to create the schema
   GraphQLSchema,
 } from 'graphql';
 
-/**
-  DEFINE YOUR TYPES BELOW
-**/
-
-const Author = new GraphQLObjectType({
-  name: 'Author',
-  description: 'This represent an author',
+/* FeedForward Type Definitions */
+const Comment = new GraphQLObjectType({
+  name: 'Comment',
+  description: 'This represent a Comment type',
   fields: () => ({
     _id: {type: new GraphQLNonNull(GraphQLString)},
-    name: {type: GraphQLString}
+    content: {type: new GraphQLNonNull(GraphQLString)},
+    points: {type: new GraphQLNonNull(GraphQLInt)}
   })
 });
 
 const Post = new GraphQLObjectType({
   name: 'Post',
-  description: 'This represent a Post',
+  description: 'This represent a Post type',
   fields: () => ({
     _id: {type: new GraphQLNonNull(GraphQLString)},
-    title: {type: new GraphQLNonNull(GraphQLString)},
-    content: {type: GraphQLString},
-    author: {
-      type: Author,
-      resolve: function(post) {
-        return _.find(AuthorsList, a => a._id == post.author);
+    content: {type: new GraphQLNonNull(GraphQLString)},
+    points: {type: new GraphQLNonNull(GraphQLInt)},
+    comments: {
+      type: new GraphQLList(Comment),
+      resolve: function() {
+        return CommentsList;
       }
     }
   })
 });
 
-// This is the Root Query
-const Query = new GraphQLObjectType({
-  name: 'BlogSchema',
-  description: 'Root of the Blog Schema',
+const Room = new GraphQLObjectType({
+  name: 'Room',
+  description: 'This represent a Room type',
   fields: () => ({
+    _id: {type: new GraphQLNonNull(GraphQLString)},
+    password: {type: new GraphQLNonNull(GraphQLString)},
+    name: {type: new GraphQLNonNull(GraphQLString)},
     posts: {
       type: new GraphQLList(Post),
       resolve: function() {
         return PostsList;
       }
-    },
-    echo: {
-      type: GraphQLString,
-      description: 'Echo what you enter',
-      args: {
-        message: {type: GraphQLString}
-      },
-      resolve: function(source, {message}) {
-        return {aa: 10};
-      }
     }
   })
 });
 
-const Mutation = new GraphQLObjectType({
-  name: 'BlogMutations',
-  description: 'Mutations of our blog',
+/* Root Query */
+const Query = new GraphQLObjectType({
+  name: 'FeedForwardSchema',
+  description: 'Root of the FeedForward Schema',
   fields: () => ({
-    createPost: {
-      type: Post,
+    rooms: {
+      type: new GraphQLList(Room),
       args: {
-        title: {type: new GraphQLNonNull(GraphQLString)},
-        content: {type: new GraphQLNonNull(GraphQLString)}
+        _id: {type: GraphQLString}
       },
-      resolve: function(source, args) {
-        let post = Object.assign({}, args);
-        // Generate the _id
-        post._id = `${Date.now()}::${Math.ceil(Math.random() * 9999999)}`;
-        // Assign a user
-        post.author = 'arunoda';
-
-        // Add the Post to the data store
-        PostsList.push(post);
-
-        // return the new post.
-        return post;
+      description: 'List of Rooms',
+      resolve: function(root, {_id}) {
+        if(_id) {
+          return _.filter(RoomsList, room => room._id === _id);
+        } else {
+          return RoomsList; /* This is for development purposes, remove so users cannot access all rooms */
+        }
       }
-    }
+    },
+    posts: {
+      type: new GraphQLList(Post),
+      args: {
+        _id: {type: GraphQLString}
+      },
+      description: 'List of Posts',
+      resolve: function(root, {_id}) {
+        if(_id) {
+          return _.filter(PostsList, post => post._id === _id);
+        } else {
+          return PostsList; /* This is for development purposes, remove so users cannot access all posts */
+        }
+      }
+    },
+    comments: {
+      type: new GraphQLList(Comment),
+      args: {
+        _id: {type: GraphQLString}
+      },
+      description: 'List of Comments',
+      resolve: function(root, {_id}) {
+        if(_id) {
+          return _.filter(CommentsList, comment => comment._id === _id);
+        } else {
+          return CommentsList; /* This is for development purposes, remove so users cannot access all comments */
+        }
+      }
+    },
   })
 });
 
-// This the Schema
+/* Defining the Schema */
 const Schema = new GraphQLSchema({
-  query: Query,
-  mutation: Mutation
+  query: Query
 });
 
 export default Schema;

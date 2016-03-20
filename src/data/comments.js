@@ -1,32 +1,6 @@
-const CommentList = [
-  {
-    _id: 'cid-' + Math.ceil(Math.random() * 99999999),
-    content: 'This is a very good blog post',
-    author: 'pahan'
-  },
-
-  {
-    _id: 'cid-' + Math.ceil(Math.random() * 99999999),
-    content: 'Keep up the good work',
-    author: 'indi'
-  }
+const CommentsList = [
+  {'_id': 'c1', 'content': 'First Comment', 'points': 1},
+  {'_id': 'c2', 'content': 'Second Comment', 'points': 2}
 ];
 
-const ReplyList = [
-  {
-    _id: 'cid-' + Math.ceil(Math.random() * 99999999),
-    content: 'Thank You!',
-    author: 'arunoda'
-  },
-
-  {
-    _id: 'cid-' + Math.ceil(Math.random() * 99999999),
-    content: 'If you need more information, just contact me.',
-    author: 'arunoda'
-  },
-];
-
-export default {
-  CommentList,
-  ReplyList
-};
+export default CommentsList;
