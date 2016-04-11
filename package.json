@@ -1,7 +1,7 @@
 {
-  "name": "FeedForward",
+  "name": "MarsChallenge",
   "version": "1.0.0",
-  "description": "A website that allows Company management to obtain feedback from their employees anonymously",
+  "description": "Red Badger challenge",
   "scripts": {
     "start": "node server.js",
     "lint": "eslint src"
@@ -18,10 +18,11 @@
     "webpack-dev-server": "^1.8.2"
   },
   "dependencies": {
-    "react": "^0.13.0",
     "graphiql": "0.3.x",
     "graphql": "0.4.x",
     "isomorphic-fetch": "*",
+    "react": "^0.13.0",
+    "shortid": "^2.2.4",
     "underscore": "1.8.x"
   }
 }
